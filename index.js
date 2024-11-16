@@ -16,12 +16,31 @@ const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.en
 dotenv.config({ path: envFile });
 
 const app = express();
+
+// Dynamic CORS Configuration
+const allowedOrigins = [
+  "http://localhost:3000", // Local development
+];
+
+// Dynamically allow Netlify branch deploy URLs
+if (process.env.NODE_ENV === "production") {
+  allowedOrigins.push(/\.netlify\.app$/); // Match all *.netlify.app subdomains
+}
+
 app.use(
   cors({
     credentials: true,
-    origin: process.env.NETLIFY_URL || "http://localhost:3000",
+    origin: (origin, callback) => {
+      // Allow if no origin (e.g., server-to-server) or origin matches allowedOrigins
+      if (!origin || allowedOrigins.some((o) => (typeof o === "string" ? o === origin : o.test(origin)))) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
   })
 );
+
 const sessionOptions = {
   secret: process.env.SESSION_SECRET || "kanbas",
   resave: false,
