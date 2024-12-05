@@ -20,11 +20,11 @@ dotenv.config({ path: envFile });
 
 // connect to the kanbas database
 const CONNECTION_STRING = process.env.MONGO_CONNECTION_STRING || "mongodb://127.0.0.1:27017/kanbas"
-mongoose.connect(CONNECTION_STRING)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch(err => console.error("MongoDB connection error:", err));
-
-console.log("MongoDB Connection String:", process.env.MONGO_CONNECTION_STRING);
+mongoose.connect(CONNECTION_STRING);
+const db = mongoose.connection;
+db.once("open", () => {
+  console.log("Database connection is open");
+});
 
 const app = express();
 
