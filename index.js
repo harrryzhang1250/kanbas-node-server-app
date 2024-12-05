@@ -21,6 +21,7 @@ dotenv.config({ path: envFile });
 // connect to the kanbas database
 const CONNECTION_STRING = process.env.MONGO_CONNECTION_STRING || "mongodb://127.0.0.1:27017/kanbas"
 mongoose.connect(CONNECTION_STRING);
+console.log("Connection String:", process.env.MONGO_CONNECTION_STRING);
 
 const app = express();
 
