@@ -13,6 +13,7 @@ export default function UserRoutes(app) {
   };
 
   const findAllUsers = async (req, res) => {
+    console.log("Connection String:", process.env.MONGO_CONNECTION_STRING);
     const { role, name } = req.query;
     if (role) {
       const users = await dao.findUsersByRole(role);
