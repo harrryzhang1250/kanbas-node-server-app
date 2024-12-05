@@ -12,13 +12,30 @@ import AssignmentRoutes from "./Kanbas/Assignments/routes.js";
 import mongoose from "mongoose";
 
 const CONNECTION_STRING = process.env.MONGO_CONNECTION_STRING || "mongodb://127.0.0.1:27017/kanbas"
+const allowedOrigins = [
+  "http://localhost:3000"
+]
+// Dynamically allow Netlify branch deploy URLs
+if (process.env.NODE_ENV === "production") {
+  allowedOrigins.push(/\.netlify\.app$/); // Match all *.netlify.app subdomains
+}
+
+// Connect to Database
 console.log("database connection =" + CONNECTION_STRING );
 mongoose.connect(CONNECTION_STRING);
+
 const app = express();
 app.use(
   cors({
     credentials: true,
-    origin: process.env.NETLIFY_URL || "http://localhost:3000",
+    origin: (origin, callback) => {
+      // Allow if no origin (e.g., server-to-server) or origin matches allowedOrigins
+      if (!origin || allowedOrigins.some((o) => (typeof o === "string" ? o === origin : o.test(origin)))) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
   })
 );
 const sessionOptions = {
